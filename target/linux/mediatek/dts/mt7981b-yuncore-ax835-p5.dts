@@ -112,6 +112,7 @@
 			reset-assert-us = <600>;
 			reset-deassert-us = <20000>;
 			phy-mode = "2500base-x";
+			label = "wan";
 		};
 	};
 };
@@ -219,7 +220,6 @@
 				compatible = "denx,fit";
 				label = "firmware";
 				reg = <0x180000 0xE00000>;
-				//reg = <0x180000 0xe20000>;
 			};
 		};
 	};

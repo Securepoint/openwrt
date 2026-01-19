@@ -118,6 +118,9 @@ mediatek_setup_interfaces()
 	yuncore,ax835)
 		ucidef_set_interfaces_lan_wan lan wan
 		;;
+	yuncore,ax835-p5)
+		ucidef_set_interfaces_lan_wan eth1 eth0
+		;;
 	mediatek,mt7986a-rfb)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4 lan6" "eth1 wan"
 		;;
@@ -215,6 +218,9 @@ mediatek_setup_macs()
 		label_mac=$wan_mac
 		;;
 	yuncore,ax835)
+		label_mac=$(mtd_get_mac_binary "Factory" 0x4)
+		;;
+	yuncore,ax835-p5)
 		label_mac=$(mtd_get_mac_binary "Factory" 0x4)
 		;;
 	esac
