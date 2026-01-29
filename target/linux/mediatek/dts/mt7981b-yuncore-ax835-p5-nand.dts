@@ -1,0 +1,265 @@
+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
+
+/dts-v1/;
+
+#include "mt7981.dtsi"
+
+/ {
+	compatible = "yuncore,ax835-p5-nand", "mediatek,mt7981";
+	model = "YunCore AX835-P5-nand";
+
+	aliases {
+		led-boot = &led_system;
+		led-failsafe = &led_system;
+		led-running = &led_system;
+		led-upgrade = &led_system;
+		serial0 = &uart0;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	//bl2_verify {
+	//	bl2_compatible = "spim-nand";
+	//};
+
+
+	gpio-keys {
+		compatible = "gpio-keys";
+
+		reset {
+			label = "reset";
+			linux,code = <KEY_RESTART>;
+			gpios = <&pio 1 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	reg_led_vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "led_vbus";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		enable-active-high;
+		regulator-always-on;
+		gpios = <&pio 5 GPIO_ACTIVE_HIGH>;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led_system: led_system {
+			label = "red:system";
+			gpios = <&pio 4 GPIO_ACTIVE_LOW>;
+		};
+
+		led_wifi24 {
+			label = "green:wifi2";
+			gpios = <&pio 34 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "phy0tpt";
+		};
+
+		led_wifi5 {
+			label = "blue:wifi5";
+			gpios = <&pio 35 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "phy1tpt";
+		};
+
+		led_hwwatchdog {
+			// a gpio-wdt watchdog couldn't be made to work.
+			// the device rebooted after 5 minutes.
+			label = "hwwatchdog";
+			gpios = <&pio 7 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "timer";
+			led-pattern = <1000>, <1000>;
+		};
+
+		// there's another "syswatchdog" on gpio2
+	};
+};
+&eth {
+	status = "okay";
+	pinctrl-names = "default";
+	//pinctrl-0 = <&eth_led0>;
+	gmac0: mac@0 {
+		compatible = "mediatek,eth-mac";
+		reg = <0>;
+		phy-mode = "2500base-x";
+		phy-handle = <&phy5>;
+		nvmem-cell-names = "mac-address";
+		nvmem-cells = <&macaddr_factory_2a>;
+
+	};
+
+	gmac1: mac@1 {
+		compatible = "mediatek,eth-mac";
+		reg = <1>;
+		phy-mode = "gmii";
+		phy-handle = <&phy0>;
+		nvmem-cell-names = "mac-address";
+		nvmem-cells = <&macaddr_factory_24>;
+	};
+
+	mdio: mdio-bus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		phy0: ethernet-phy@0 {
+			compatible = "ethernet-phy-id03a2.9461";
+			reg = <0>;
+			phy-mode = "gmii";
+			nvmem-cells = <&phy_calibration>;
+			nvmem-cell-names = "phy-cal-data";
+		};
+		phy5: phy@5 {
+			compatible = "ethernet-phy-id67c9.de0a";
+			reg = <5>;
+			reset-gpios = <&pio 39 1>;
+			reset-assert-us = <600>;
+			reset-deassert-us = <20000>;
+			phy-mode = "2500base-x";
+			label = "wan";
+		};
+	};
+};
+&pio {
+	spi0_flash_pins: spi0-pins {
+		mux {
+			function = "spi";
+			groups = "spi0", "spi0_wp_hold";
+		};
+		conf-pd {
+			bias-pull-down = <0x67>;
+			drive-strength = <0x08>;
+			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO";
+		};
+
+		conf-pu {
+			bias-pull-up = <0x67>;
+			drive-strength = <0x08>;
+			pins = "SPI0_CS", "SPI0_HOLD", "SPI0_WP";
+		};
+
+	};
+
+	spi2_flash_pins: spi2-pins {
+		mux {
+			function = "spi";
+			groups = "spi2", "spi2_wp_hold";
+		};
+
+		conf-pu {
+			pins = "SPI2_CS", "SPI2_HOLD", "SPI2_WP";
+			drive-strength = <8>;
+			bias-pull-up = <103>;
+		};
+
+		conf-pd {
+			pins = "SPI2_CLK", "SPI2_MOSI", "SPI2_MISO";
+			drive-strength = <8>;
+			bias-pull-down = <103>;
+		};
+	};
+};
+
+&spi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi0_flash_pins>;
+	status = "okay";
+	spi_nand: flash@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-nand";
+		reg = <0>;
+		spi-max-frequency = <52000000>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+		mediatek,nmbm;
+		mediatek,bmt-max-ratio = <1>;
+		mediatek,bmt-max-reserved-blocks = <64>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "BL2";
+				reg = <0x00000 0x100000>;
+				read-only;
+			};
+
+			partition@100000 {
+				label = "u-boot-env";
+				reg = <0x100000 0x80000>;
+				//read-only;
+			};
+
+			factory: partition@180000 {
+				label = "Factory";
+				reg = <0x180000 0x200000>;
+				read-only;
+
+				nvmem-layout {
+					compatible = "fixed-layout";
+					#address-cells = <1>;
+					#size-cells = <1>;
+
+					eeprom_factory: eeprom@0 {
+						reg = <0x0 0x1000>;
+					};
+
+					macaddr_factory_4: macaddr@4 {
+						reg = <0x4 0x6>;
+					};
+
+					macaddr_factory_24: macaddr@24 {
+						reg = <0x24 0x6>;
+					};
+
+					macaddr_factory_2a: macaddr@2a {
+						reg = <0x2a 0x6>;
+					};
+				};
+			};
+
+			partition@380000 {
+			label = "FIP";
+				reg = <0x380000 0x200000>;
+				read-only;
+			};
+
+			partition@580000 {
+				compatible = "linux,ubi";
+				label = "ubi";
+				reg = <0x580000 0x4000000>;
+			};
+			partition@4580000 {
+				compatible = "linux,ubi";
+				label = "horst";
+				reg = <0x4580000 0x3800000>;
+			};
+		};
+	};
+};
+
+&spi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi2_flash_pins>;
+	status = "disabled";
+
+};
+
+
+&uart0 {
+	status = "okay";
+};
+
+&watchdog {
+	status = "okay";
+};
+
+&wifi {
+	status = "okay";
+	nvmem-cells = <&eeprom_factory 0>;
+	nvmem-cell-names = "eeprom";
+};

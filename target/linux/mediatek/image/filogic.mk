@@ -2117,6 +2117,31 @@ define Device/yuncore_ax835-p5
 endef
 TARGET_DEVICES += yuncore_ax835-p5
 
+define Device/yuncore_ax835-p5-nand
+  DEVICE_VENDOR := YunCore
+  DEVICE_MODEL := AX835-P5-nand
+  DEVICE_DTS := mt7981b-yuncore-ax835-p5-nand
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_DTS_LOADADDR := 0x47000000
+  IMAGES := sysupgrade.bin
+  #IMAGE_SIZE := 14336k
+  IMAGE_SIZE := 15204352
+  SUPPORTED_DEVICES += mediatek,mt7981-spim-nand-rfb mediathek,yuncore_ax835-p5-nand
+  KERNEL := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  #IMAGE/sysupgrade.bin := append-kernel | pad-to 128k | append-rootfs | pad-rootfs | check-size | append-metadata
+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_IN_UBI := 1
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-mt76
+endef
+TARGET_DEVICES += yuncore_ax835-p5-nand
+
 define Device/zbtlink_zbt-z8102ax
   DEVICE_VENDOR := Zbtlink
   DEVICE_MODEL := ZBT-Z8102AX

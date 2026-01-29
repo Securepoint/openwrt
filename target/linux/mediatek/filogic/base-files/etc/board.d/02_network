@@ -118,7 +118,8 @@ mediatek_setup_interfaces()
 	yuncore,ax835)
 		ucidef_set_interfaces_lan_wan lan wan
 		;;
-	yuncore,ax835-p5)
+	yuncore,ax835-p5|\
+	yuncore,ax835-p5-nand)
 		ucidef_set_interfaces_lan_wan eth1 eth0
 		;;
 	mediatek,mt7986a-rfb)
