@@ -20,11 +20,6 @@
 		stdout-path = "serial0:115200n8";
 	};
 
-	//bl2_verify {
-	//	bl2_compatible = "spim-nand";
-	//};
-
-
 	gpio-keys {
 		compatible = "gpio-keys";
 
@@ -74,13 +69,14 @@
 			led-pattern = <1000>, <1000>;
 		};
 
-		// there's another "syswatchdog" on gpio2
+		// there's another internal "syswatchdog": &watchdog
 	};
 };
 &eth {
 	status = "okay";
 	pinctrl-names = "default";
-	//pinctrl-0 = <&eth_led0>;
+	pinctrl-0 = <&gbe_led0_pins>;
+
 	gmac0: mac@0 {
 		compatible = "mediatek,eth-mac";
 		reg = <0>;
@@ -88,39 +84,33 @@
 		phy-handle = <&phy5>;
 		nvmem-cell-names = "mac-address";
 		nvmem-cells = <&macaddr_factory_2a>;
-
 	};
 
 	gmac1: mac@1 {
 		compatible = "mediatek,eth-mac";
 		reg = <1>;
 		phy-mode = "gmii";
-		phy-handle = <&phy0>;
+		phy-handle = <&int_gbe_phy>;
 		nvmem-cell-names = "mac-address";
 		nvmem-cells = <&macaddr_factory_24>;
 	};
+};
 
-	mdio: mdio-bus {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		phy0: ethernet-phy@0 {
-			compatible = "ethernet-phy-id03a2.9461";
-			reg = <0>;
-			phy-mode = "gmii";
-			nvmem-cells = <&phy_calibration>;
-			nvmem-cell-names = "phy-cal-data";
-		};
-		phy5: phy@5 {
-			compatible = "ethernet-phy-id67c9.de0a";
-			reg = <5>;
-			reset-gpios = <&pio 39 1>;
-			reset-assert-us = <600>;
-			reset-deassert-us = <20000>;
-			phy-mode = "2500base-x";
-			label = "wan";
-		};
+&mdio_bus {
+	phy5: phy@5 {
+		compatible = "ethernet-phy-ieee802.3-c45";
+		reg = <5>;
+		phy-mode = "2500base-x";
+		reset-gpios = <&pio 39 1>;
+		reset-assert-us = <600>;
+		reset-deassert-us = <20000>;
+
+		// configures the led registers
+		// see VSPEC1_LEDx registers in gpy211 manual
+		mxl,led-config = <0x00f0 0x0 0x0 0x0>;
 	};
 };
+
 &pio {
 	spi0_flash_pins: spi0-pins {
 		mux {
@@ -139,25 +129,6 @@
 			pins = "SPI0_CS", "SPI0_HOLD", "SPI0_WP";
 		};
 
-	};
-
-	spi2_flash_pins: spi2-pins {
-		mux {
-			function = "spi";
-			groups = "spi2", "spi2_wp_hold";
-		};
-
-		conf-pu {
-			pins = "SPI2_CS", "SPI2_HOLD", "SPI2_WP";
-			drive-strength = <8>;
-			bias-pull-up = <103>;
-		};
-
-		conf-pd {
-			pins = "SPI2_CLK", "SPI2_MOSI", "SPI2_MISO";
-			drive-strength = <8>;
-			bias-pull-down = <103>;
-		};
 	};
 };
 
@@ -233,22 +204,9 @@
 				label = "ubi";
 				reg = <0x580000 0x4000000>;
 			};
-			partition@4580000 {
-				compatible = "linux,ubi";
-				label = "horst";
-				reg = <0x4580000 0x3800000>;
-			};
 		};
 	};
 };
-
-&spi2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&spi2_flash_pins>;
-	status = "disabled";
-
-};
-
 
 &uart0 {
 	status = "okay";
