@@ -1308,7 +1308,7 @@ define Device/mediatek_mt7981-rfb
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
   KERNEL_INITRAMFS_SUFFIX := .itb
   KERNEL_IN_UBI := 1
-  UBOOTENV_IN_UBI := 1
+  UBOOTENV_IN_UBI := 0
   IMAGES := sysupgrade.itb
   IMAGE_SIZE := $$(shell expr 64 + $$(CONFIG_TARGET_ROOTFS_PARTSIZE))m
   IMAGE/sysupgrade.itb := append-kernel | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-with-rootfs | pad-rootfs | append-metadata
@@ -2122,23 +2122,25 @@ define Device/yuncore_ax835-p5-nand
   DEVICE_MODEL := AX835-P5-nand
   DEVICE_DTS := mt7981b-yuncore-ax835-p5-nand
   DEVICE_DTS_DIR := ../dts
-  DEVICE_DTS_LOADADDR := 0x47000000
-  IMAGES := sysupgrade.bin
-  #IMAGE_SIZE := 14336k
-  IMAGE_SIZE := 15204352
-  SUPPORTED_DEVICES += mediatek,mt7981-spim-nand-rfb mediathek,yuncore_ax835-p5-nand
-  KERNEL := kernel-bin | lzma | \
-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  #IMAGE_SIZE := 15204352
+  #SUPPORTED_DEVICES += mediatek,mt7981-spim-nand-rfb mediathek,yuncore_ax835-p5-nand
+  #SUPPORTED_DEVICES += mediatek,mt7981-spim-snand-rfb
+  FILESYSTEMS := squashfs
+  KERNEL := kernel-bin | lzma
   KERNEL_INITRAMFS := kernel-bin | lzma | \
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
-  #IMAGE/sysupgrade.bin := append-kernel | pad-to 128k | append-rootfs | pad-rootfs | check-size | append-metadata
-  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
   UBINIZE_OPTS := -E 5
   BLOCKSIZE := 128k
   PAGESIZE := 2048
   KERNEL_IN_UBI := 1
-  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-mt76
+  UBOOTENV_IN_UBI := 1
+  IMAGES := sysupgrade.itb factory.bin
+  IMAGE/factory.bin := append-ubi 
+  IMAGE/sysupgrade.itb := append-kernel | fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | pad-rootfs | append-metadata
+  ARTIFACTS := preloader.bin bl31-uboot.fip
+  ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ddr3
+  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot yuncore_ax835_p5_nand
+  DEVICE_PACKAGES := fitblk kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-mt76
 endef
 TARGET_DEVICES += yuncore_ax835-p5-nand
 

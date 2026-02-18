@@ -17,6 +17,7 @@
 	};
 
 	chosen {
+		rootdisk = <&ubi_rootdisk>;
 		stdout-path = "serial0:115200n8";
 	};
 
@@ -202,7 +203,21 @@
 			partition@580000 {
 				compatible = "linux,ubi";
 				label = "ubi";
-				reg = <0x580000 0x4000000>;
+				reg = <0x580000 0x7a80000>;
+				volumes {
+					ubi_ubootenv: ubi-volume-ubootenv {
+						volname = "ubootenv";
+					};
+					ubi_rootdisk: ubi-volume-fit {
+						volname = "fit";
+					};
+					ubi_fit_volume2: ubi-volume-fit2 {
+						volname = "recovery";
+					};
+					ubi_rootfs_data: ubi-volume-rootfs_data {
+						volname = "rootfs_data";
+					};
+				};
 			};
 		};
 	};

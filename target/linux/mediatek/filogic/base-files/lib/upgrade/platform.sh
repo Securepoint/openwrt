@@ -141,6 +141,10 @@ platform_do_upgrade() {
 	totolink,x6000r)
 		default_do_upgrade "$1"
 		;;
+	yuncore,ax835-p5-nand)
+		CI_KERNPART="fit"
+		nand_do_upgrade "$1"
+		;;
 	dlink,aquila-pro-ai-m30-a1|\
 	dlink,aquila-pro-ai-m60-a1)
 		fw_setenv sw_tryactive 0
