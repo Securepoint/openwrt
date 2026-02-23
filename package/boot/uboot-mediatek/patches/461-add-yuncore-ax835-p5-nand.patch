@@ -1,195 +1,4 @@
 --- /dev/null
-+++ b/arch/arm/dts/mt7981-yuncore-ax835-p5-nand.dts
-@@ -0,0 +1,188 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2022 MediaTek Inc.
-+ * Author: Sam Shih <sam.shih@mediatek.com>
-+ */
-+
-+/dts-v1/;
-+#include "mt7981.dtsi"
-+#include <dt-bindings/gpio/gpio.h>
-+
-+/ {
-+	#address-cells = <1>;
-+	#size-cells = <1>;
-+	model = "mt7981-rfb";
-+	compatible = "mediatek,mt7981", "mediatek,mt7981-rfb";
-+	chosen {
-+		stdout-path = &uart0;
-+		tick-timer = &timer0;
-+	};
-+
-+	memory@40000000 {
-+		device_type = "memory";
-+		reg = <0x40000000 0x10000000>;
-+	};
-+
-+	bl2_verify {
-+		bl2_compatible = "spim-nand";
-+	};
-+};
-+
-+&i2c0 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&i2c0_pins>;
-+	status = "okay";
-+};
-+
-+&uart0 {
-+	status = "okay";
-+};
-+
-+&uart1 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&uart1_pins>;
-+	status = "disabled";
-+};
-+
-+&eth {
-+    status = "okay";
-+    mediatek,gmac-id = <1>;
-+    phy-mode = "gmii";
-+    phy-handle = <&phy0>;
-+
-+	phy0: ethernet-phy@0 {
-+			reg = <0>;
-+			phy-mode = "gmii";
-+		};
-+		
-+	fixed-link {
-+		speed = <1000>;
-+		full-duplex;
-+	};
-+};
-+
-+&pinctrl {
-+	i2c0_pins: i2c0-pins {
-+		mux {
-+			function = "i2c";
-+			groups = "i2c0_1";
-+		};
-+	};
-+
-+	spi_flash_pins: spi0-pins-func-1 {
-+		mux {
-+			function = "flash";
-+			groups = "spi0", "spi0_wp_hold";
-+		};
-+
-+		conf-pu {
-+			pins = "SPI0_CS", "SPI0_HOLD", "SPI0_WP";
-+			drive-strength = <MTK_DRIVE_8mA>;
-+			bias-pull-up = <MTK_PUPD_SET_R1R0_11>;
-+		};
-+
-+		conf-pd {
-+			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO";
-+			drive-strength = <MTK_DRIVE_8mA>;
-+			bias-pull-down = <MTK_PUPD_SET_R1R0_11>;
-+		};
-+	};
-+
-+	spic_pins: spi1-pins-func-1 {
-+		mux {
-+			function = "spi";
-+			groups = "spi1_1";
-+		};
-+	};
-+
-+	uart1_pins: spi1-pins-func-3 {
-+		mux {
-+			function = "uart";
-+			groups = "uart1_2";
-+		};
-+	};
-+
-+	/* pin15 as pwm0 */
-+	one_pwm_pins: one-pwm-pins {
-+		mux {
-+			function = "pwm";
-+			groups = "pwm0_1";
-+		};
-+	};
-+
-+	/* pin15 as pwm0 and pin14 as pwm1 */
-+	two_pwm_pins: two-pwm-pins {
-+		mux {
-+			function = "pwm";
-+			groups = "pwm0_1", "pwm1_0";
-+		};
-+	};
-+
-+	/* pin15 as pwm0, pin14 as pwm1, pin7 as pwm2 */
-+	three_pwm_pins: three-pwm-pins {
-+		mux {
-+			function = "pwm";
-+			groups = "pwm0_1", "pwm1_0", "pwm2";
-+		};
-+	};
-+};
-+
-+&spi0 {
-+	#address-cells = <1>;
-+	#size-cells = <0>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&spi_flash_pins>;
-+	status = "okay";
-+	must_tx;
-+	enhance_timing;
-+	dma_ext;
-+	ipm_design;
-+	support_quad;
-+	tick_dly = <2>;
-+	sample_sel = <0>;
-+
-+	spi_nand@0 {
-+		compatible = "spi-nand";
-+		reg = <0>;
-+		spi-max-frequency = <52000000>;
-+                       partitions {
-+                                compatible = "fixed-partitions";
-+                                #address-cells = <0x00000001>;
-+                                #size-cells = <0x00000001>;
-+                                partition@0 {
-+                                        label = "BL2";
-+                                        reg = <0x00000000 0x00100000>;
-+                                };
-+                                partition@100000 {
-+                                        label = "u-boot-env";
-+                                        reg = <0x00100000 0x00080000>;
-+                                };
-+                                partition@180000 {
-+                                        label = "Factory";
-+                                        reg = <0x00180000 0x00200000>;
-+                                        phandle = <0x00000025>;
-+                                };
-+                                partition@380000 {
-+                                        label = "FIP";
-+                                        reg = <0x00380000 0x00200000>;
-+                                };
-+                                partition@580000 {
-+                                        label = "ubi";
-+                                        //reg = <0x00580000 0x04000000>;
-+                                        reg = <0x00580000 0x7a80000>;
-+                                };
-+                        };
-+
-+	};
-+};
-+
-+&pwm {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&two_pwm_pins>;
-+	status = "okay";
-+};
-+
-+&watchdog {
-+	status = "disabled";
-+};
-+
---- /dev/null
 +++ b/configs/mt7981_yuncore_ax835-p5-nand_defconfig
 @@ -0,0 +1,1665 @@
 +#
@@ -1864,3 +1673,231 @@
 +serverip=192.168.1.2
 +loadaddr=0x46000000
 +bootcmd=ubi read 0x46000000 fit; bootm
+--- /dev/null
++++ b/arch/arm/dts/mt7981-yuncore-ax835-p5-nand.dts
+@@ -0,0 +1,225 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++
++/dts-v1/;
++
++#include "mt7981.dtsi"
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/linux-event-codes.h>
++
++/ {
++	#address-cells = <1>;
++	#size-cells = <1>;
++	compatible = "yuncore,ax835-p5-nand", "mediatek,mt7981";
++	model = "YunCore AX835-P5-nand";
++
++	chosen {
++		stdout-path = &uart0;
++		tick-timer = &timer0;
++	};
++
++	memory@40000000 {
++		device_type = "memory";
++		reg = <0x40000000 0x10000000>;
++	};
++
++	gpio-keys {
++		compatible = "gpio-keys";
++
++		reset {
++			label = "reset";
++			linux,code = <KEY_RESTART>;
++			gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	reg_led_vbus {
++		compatible = "regulator-fixed";
++		regulator-name = "led_vbus";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		enable-active-high;
++		regulator-always-on;
++		gpios = <&gpio 5 GPIO_ACTIVE_HIGH>;
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		led_red {
++			label = "red";
++			gpios = <&gpio 4 GPIO_ACTIVE_LOW>;
++		};
++
++		led_green {
++			label = "green";
++			gpios = <&gpio 34 GPIO_ACTIVE_LOW>;
++		};
++
++		led_blue {
++			label = "blue";
++			gpios = <&gpio 35 GPIO_ACTIVE_LOW>;
++		};
++
++		led_hwwatchdog {
++			// a gpio-wdt watchdog couldn't be made to work.
++			// the device rebooted after 5 minutes.
++			label = "hwwatchdog";
++			gpios = <&gpio 7 GPIO_ACTIVE_LOW>;
++			linux,default-trigger = "timer";
++			led-pattern = <1000>, <1000>;
++		};
++
++		// there's another internal "syswatchdog": &watchdog
++	};
++};
++
++&i2c0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c0_pins>;
++	status = "okay";
++};
++
++&pinctrl {
++	i2c0_pins: i2c0-pins {
++		mux {
++			function = "i2c";
++			groups = "i2c0_1";
++		};
++	};
++	spi_flash_pins: spi0-pins-func-1 {
++		mux {
++			function = "flash";
++			groups = "spi0", "spi0_wp_hold";
++		};
++
++		conf-pu {
++			pins = "SPI0_CS", "SPI0_HOLD", "SPI0_WP";
++			drive-strength = <MTK_DRIVE_8mA>;
++			bias-pull-up = <MTK_PUPD_SET_R1R0_11>;
++		};
++		conf-pd {
++			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO";
++			drive-strength = <MTK_DRIVE_8mA>;
++			bias-pull-down = <MTK_PUPD_SET_R1R0_11>;
++		};
++	};
++	spic_pins: spi1-pins-func-1 {
++		mux {
++			function = "spi";
++			groups = "spi1_1";
++		};
++	};
++	one_pwm_pins: one-pwm-pins {
++		mux {
++			function = "pwm";
++			groups = "pwm0_1";
++		};
++	};
++	/* pin15 as pwm0 and pin14 as pwm1 */
++	two_pwm_pins: two-pwm-pins {
++		mux {
++			function = "pwm";
++			groups = "pwm0_1", "pwm1_0";
++		};
++	};
++};
++
++&eth {
++	status = "okay";
++	mediatek,gmac-id = <1>;
++	phy-mode = "gmii";
++	phy-handle = <&phy0>;
++	phy0: ethernet-phy@0 {
++		reg = <0>;
++		phy-mode = "gmii";
++	};
++	fixed-link {
++		speed = <1000>;
++		full-duplex;
++	};
++};
++
++&spi0 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&spi_flash_pins>;
++	status = "okay";
++	must_tx;
++	enhance_timing;
++	dma_ext;
++	ipm_design;
++	support_quad;
++	tick_dly = <2>;
++	sample_sel = <0>;
++
++	spi_nand@0 {
++		compatible = "spi-nand";
++		reg = <0>;
++		spi-max-frequency = <52000000>;
++
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "BL2";
++				reg = <0x00000 0x100000>;
++				read-only;
++			};
++
++			partition@100000 {
++				label = "u-boot-env";
++				reg = <0x100000 0x80000>;
++				//read-only;
++			};
++
++			factory: partition@180000 {
++				label = "Factory";
++				reg = <0x180000 0x200000>;
++				read-only;
++			};
++
++			partition@380000 {
++				label = "FIP";
++				reg = <0x380000 0x200000>;
++			};
++
++			partition@580000 {
++				compatible = "linux,ubi";
++				label = "ubi";
++				reg = <0x580000 0x7a80000>;
++			/*	volumes {
++					ubi_ubootenv: ubi-volume-ubootenv {
++						volname = "ubootenv";
++					};
++					ubi_rootdisk: ubi-volume-fit {
++						volname = "fit";
++					};
++					ubi_fit_volume2: ubi-volume-fit2 {
++						volname = "recovery";
++					};
++					ubi_rootfs_data: ubi-volume-rootfs_data {
++						volname = "rootfs_data";
++					};
++				}; */
++			};
++		};
++	};
++};
++
++&pwm {
++	pinctrl-names = "default";
++	pinctrl-0 = <&two_pwm_pins>;
++	status = "okay";
++};
++
++
++&uart0 {
++	status = "okay";
++};
++
++&watchdog {
++	status = "disabled";
++};
