@@ -95,6 +95,7 @@ platform_do_upgrade() {
 	xiaomi,mi-router-ax3000t-ubootmod|\
 	xiaomi,redmi-router-ax6000-ubootmod|\
 	xiaomi,mi-router-wr30u-ubootmod|\
+	yuncore,ax835-p5-nand|\
 	zyxel,ex5601-t0-ubootmod)
 		fit_do_upgrade "$1"
 		;;
@@ -140,10 +141,6 @@ platform_do_upgrade() {
 	wavlink,wl-wn573hx3|\
 	totolink,x6000r)
 		default_do_upgrade "$1"
-		;;
-	yuncore,ax835-p5-nand)
-		CI_KERNPART="fit"
-		nand_do_upgrade "$1"
 		;;
 	dlink,aquila-pro-ai-m30-a1|\
 	dlink,aquila-pro-ai-m60-a1)
