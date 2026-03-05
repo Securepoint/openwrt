@@ -1668,12 +1668,13 @@
 +# CONFIG_TOOLS_MKFWUMDATA is not set
 --- /dev/null
 +++ b/yuncore_ax835_p5_nand_env
-@@ -0,0 +1,5 @@
+@@ -0,0 +1,6 @@
 +ipaddr=192.168.1.1
 +serverip=192.168.1.2
 +loadaddr=0x46000000
-+bootcmd=if button reset; then ubi read $loadaddr recovery; else ubi read $loadaddr fit; fi; bootm
-+rootfs_data_max=0x1312D00
++bootcmd=if button reset; then ubi read $loadaddr recovery; else run ubi_prepare_rootfs; ubi read $loadaddr fit; fi; bootm
++rootfs_data_max=-
++ubi_prepare_rootfs=if ubi check rootfs_data ; then else saveenv; ubi create rootfs_data $rootfs_data_max dynamic; fi
 --- /dev/null
 +++ b/arch/arm/dts/mt7981-yuncore-ax835-p5-nand.dts
 @@ -0,0 +1,225 @@
