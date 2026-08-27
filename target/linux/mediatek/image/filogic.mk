@@ -3522,13 +3522,11 @@ define Device/yuncore_ax835-p5-nand
   UBINIZE_OPTS := -E 5
   BLOCKSIZE := 128k
   PAGESIZE := 2048
-  UBINIZE_PARTS := fip=:$(STAGING_DIR_IMAGE)/mt7981_yuncore_ax835-p5-nand-u-boot.fip \
-		   recovery=:$(KDIR)/tmp/$$(KERNEL_INITRAMFS_IMAGE)
+  UBINIZE_PARTS := recovery=$(KDIR)/tmp/$$(KERNEL_INITRAMFS_IMAGE)
   IMAGES := sysupgrade.itb
   IMAGE/sysupgrade.itb := append-kernel | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | pad-rootfs | append-metadata
   ARTIFACTS := preloader.bin bl31-uboot.fip factory.ubi
   ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ddr3
-  #ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot yuncore_ax835_p5_nand
   ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot yuncore_ax835-p5-nand
   ARTIFACT/factory.ubi := ubinize-image fit squashfs-sysupgrade.itb
   DEVICE_PACKAGES := fitblk kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-mt76
