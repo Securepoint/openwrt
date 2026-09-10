@@ -3535,7 +3535,7 @@ define Device/yuncore_ax835-p5-nand
   UBINIZE_OPTS := -E 5
   BLOCKSIZE := 128k
   PAGESIZE := 2048
-  UBINIZE_PARTS := recovery=$(KDIR)/tmp/yuncore-ax835-p5-nand-recovery.itb
+  UBINIZE_PARTS := recovery=$(BIN_DIR)/yuncore-ax835-p5-nand-recovery.itb
   IMAGES := sysupgrade.itb
   IMAGE/sysupgrade.itb := append-kernel | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | pad-rootfs | append-metadata
   ARTIFACTS := preloader.bin bl31-uboot.fip factory.ubi
