@@ -3508,6 +3508,20 @@ define Device/yuncore_ax835
 endef
 TARGET_DEVICES += yuncore_ax835
 
+define Device/yuncore_ax835-p5-nand-recovery
+  DEVICE_VENDOR := YunCore
+  DEVICE_MODEL := AX835-P5-nand
+  DEVICE_DTS := mt7981b-yuncore-ax835-p5-nand-recovery
+  DEVICE_DTS_DIR := ../dts
+  KERNEL := kernel-bin | gzip
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
+  KERNEL_INITRAMFS_PREFIX := yuncore-ax835-p5-nand
+  IMAGES :=
+endef
+TARGET_DEVICES += yuncore_ax835-p5-nand-recovery
+
 define Device/yuncore_ax835-p5-nand
   DEVICE_VENDOR := YunCore
   DEVICE_MODEL := AX835-P5-nand
@@ -3516,13 +3530,12 @@ define Device/yuncore_ax835-p5-nand
   KERNEL := kernel-bin | gzip
   KERNEL_INITRAMFS := kernel-bin | lzma | \
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
-  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
   KERNEL_IN_UBI := 1
   UBOOTENV_IN_UBI := 1
   UBINIZE_OPTS := -E 5
   BLOCKSIZE := 128k
   PAGESIZE := 2048
-  UBINIZE_PARTS := recovery=$(KDIR)/tmp/$$(KERNEL_INITRAMFS_IMAGE)
+  UBINIZE_PARTS := recovery=$(KDIR)/tmp/yuncore-ax835-p5-nand-recovery.itb
   IMAGES := sysupgrade.itb
   IMAGE/sysupgrade.itb := append-kernel | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | pad-rootfs | append-metadata
   ARTIFACTS := preloader.bin bl31-uboot.fip factory.ubi
