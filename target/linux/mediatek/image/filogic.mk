@@ -3508,20 +3508,6 @@ define Device/yuncore_ax835
 endef
 TARGET_DEVICES += yuncore_ax835
 
-define Device/yuncore_ax835-p5-nand-recovery
-  DEVICE_VENDOR := YunCore
-  DEVICE_MODEL := AX835-P5-nand
-  DEVICE_DTS := mt7981b-yuncore-ax835-p5-nand-recovery
-  DEVICE_DTS_DIR := ../dts
-  KERNEL := kernel-bin | gzip
-  KERNEL_INITRAMFS := kernel-bin | lzma | \
-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
-  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
-  KERNEL_INITRAMFS_PREFIX := yuncore-ax835-p5-nand
-  IMAGES :=
-endef
-TARGET_DEVICES += yuncore_ax835-p5-nand-recovery
-
 define Device/yuncore_ax835-p5-nand
   DEVICE_VENDOR := YunCore
   DEVICE_MODEL := AX835-P5-nand
