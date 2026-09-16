@@ -4,12 +4,12 @@
 +ipaddr=192.168.1.1
 +serverip=192.168.1.2
 +loadaddr=0x46000000
-+bootcmd=if button reset; then ubi read $loadaddr recovery; else run ubi_prepare_rootfs; ubi read $loadaddr fit; fi; bootm
++bootcmd=if button reset; then run loadrecovery; else run ubi_prepare_rootfs; led green on; ubi read $loadaddr fit; fi; bootm
 +upgrade_available=0
 +bootlimit=3
-+altbootcmd=ubi read $loadaddr recovery;bootm
-+rootfs_data_max=-
-+ubi_prepare_rootfs=if ubi check rootfs_data ; then else saveenv; ubi create rootfs_data $rootfs_data_max dynamic; fi
++altbootcmd=run loadrecovery; bootm
++loadrecovery=led red on; led blue on; ubi read $loadaddr recovery;
++ubi_prepare_rootfs=if ubi check rootfs_data ; then else saveenv; ubi create rootfs_data - dynamic; fi
 --- /dev/null
 +++ b/arch/arm/dts/mt7981-yuncore-ax835-p5-nand.dts
 @@ -0,0 +1,225 @@
@@ -255,7 +255,7 @@
 +CONFIG_TARGET_MT7981=y
 +CONFIG_SYS_LOAD_ADDR=0x46000000
 +CONFIG_MTK_BROM_HEADER_INFO="media=snand;nandinfo=2k+64"
-+CONFIG_RESET_BUTTON_LABEL="reset"
++CONFIG_RESET_BUTTON_LABEL=""
 +CONFIG_RESET_BUTTON_SETTLE_DELAY=0
 +CONFIG_WATCHDOG_TIMEOUT_MSECS=60000
 +CONFIG_ERR_PTR_OFFSET=0x0
