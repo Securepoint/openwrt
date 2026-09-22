@@ -9,10 +9,10 @@
 	model = "YunCore AX835-P5-nand";
 
 	aliases {
-		led-boot = &led_system;
-		led-failsafe = &led_system;
-		led-running = &led_system;
-		led-upgrade = &led_system;
+		//led-boot = &led_system;
+		//led-failsafe = &led_system;
+		//led-running = &led_system;
+		led-upgrade = &led_blue;
 		serial0 = &uart0;
 	};
 
@@ -45,20 +45,20 @@
 		compatible = "gpio-leds";
 
 		led_system: led_system {
-			label = "red:system";
+			label = "red";
 			gpios = <&pio 4 GPIO_ACTIVE_LOW>;
 		};
 
 		led_wifi24 {
-			label = "green:wifi2";
+			label = "green";
 			gpios = <&pio 34 GPIO_ACTIVE_LOW>;
-			linux,default-trigger = "phy0tpt";
+			//linux,default-trigger = "phy0tpt";
 		};
 
-		led_wifi5 {
-			label = "blue:wifi5";
+		led_blue: led_blue {
+			label = "blue";
 			gpios = <&pio 35 GPIO_ACTIVE_LOW>;
-			linux,default-trigger = "phy1tpt";
+			//linux,default-trigger = "phy1tpt";
 		};
 
 		led_hwwatchdog {
